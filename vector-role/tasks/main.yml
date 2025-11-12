@@ -1,2 +1,32 @@
 ---
-# tasks file for vector-role
+- name: Install Vector
+  become: true
+  ansible.builtin.apt:
+    name: vector
+    state: present
+
+- name: Create Vector config directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/vector
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Setup Vector configuration
+  become: true
+  ansible.builtin.template:
+    src: vector.yml.j2
+    dest: /etc/vector/vector.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart vector
+
+- name: Start Vector service
+  become: true
+  ansible.builtin.systemd:
+    name: vector
+    state: started
+    enabled: true
