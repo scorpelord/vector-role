@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check Vector service is running
+      systemd:
+        name: vector
+      register: vector_service
+
+    - name: Assert Vector service is active
+      assert:
+        that:
+          - vector_service.status.ActiveState == "active"
+        fail_msg: "Vector service is not active"
+
+    - name: Check Vector config file exists
+      stat:
+        path: /etc/vector/vector.yml
+      register: vector_config
+
+    - name: Assert Vector config exists
+      assert:
+        that:
+          - vector_config.stat.exists
+        fail_msg: "Vector config file does not exist"
